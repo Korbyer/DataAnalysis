@@ -68,4 +68,4 @@ def copyCSV(year):
         logging.exception(e)
 
 # makeDB('2015')
-copyCSV('2015')
+# copyCSV('2015')
