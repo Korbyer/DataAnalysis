@@ -1,21 +1,19 @@
 import csv,logging
 from bs4 import BeautifulSoup
-from lxml import etree as ET
+
+# 서울시 행정구역 읍면동 위치정보 (좌표계: ITRF2000)
+# http://data.seoul.go.kr/openinf/mapview.jsp?infId=OA-13222
+
+# 서울시 법정구역 읍면동 공간정보 (좌표계: ITRF2000)
+# http://data.seoul.go.kr/openinf/mapview.jsp?infId=OA-13220
 
 def TestMap(year):
-    svg = open('C:\\Users\\admin\\PycharmProjects\\DataAnalysis\seoul_edit\\sample.svg', 'r').read()
+    svg = open('C:\\Users\\admin\\PycharmProjects\\DataAnalysis\\seoul_edit\\sample_law.svg', 'r').read()
     senior_count = {}
-    counts_only = []
     dongName_list=[]
-    # tree = ET.parse('C:\\Users\\admin\\PycharmProjects\\DataAnalysis\seoul_edit\\sample.svg')
-    # root = tree.getroot()
-    # for child in root:
-    #     if 'path' in child.tag and child.attrib['id'] not in ["seperator", "State_Lines"]:
-    #         child.attrib['style'] = g_style+'color'
-    past_header = False
-    soup = BeautifulSoup(svg)
+    soup = BeautifulSoup(svg, 'lxml')
     paths = soup.find_all('g')
-    colors = ["#E5E3FA", "#B0ABF9", "#847DFA", "#3D2FF7", "#0C0296", "#03002C"]
+    colors = ["#E5E3FA", "#B0ABF9", "#847DFA", "#3D2FF7", "#0C0296", "#03002C", "#FF0000"]
     g_style = 'font-size:12px;fill-rule:nonzero;stroke:#FFFFFF;stroke-opacity:1;stroke-width:0.1;stroke-miterlimit:4;stroke-dasharray:none;stroke-linecap:butt;marker-start:none;stroke-linejoin:bevel;fill:'
     try:
         with open('C:\\Users\\admin\\PycharmProjects\\DataAnalysis\\data\\Food_Date_'+year+'.csv', 'r') as f:
@@ -34,41 +32,65 @@ def TestMap(year):
                 except:
                     pass
 
-        with open('C:\\Users\\admin\\PycharmProjects\\DataAnalysis\\data\\TL_SCCO_EMD_2015_W.csv', 'r') as dbf:
+        with open('C:\\Users\\admin\\PycharmProjects\\DataAnalysis\\data\\TC_SPBE17_2015.csv', 'r') as dbf:
             next(dbf)
+            i = 1
             dbfreader = csv.reader(dbf, delimiter=',')
             for row in dbfreader:
                 dongName = row[1]
                 dongName_list.append(dongName)
             for p in paths:
-                i = 0
-                # if p['id']:
-                try:
-                    counts_only.append(senior_count[dongName_list[i]])
-                    count = senior_count[dongName_list[i]]
-                    i += 1
-                except:
-                    continue
-                if count > 100000000:
-                    color_class = 5
-                elif count > 5000000:
-                    color_class = 4
-                elif count > 3000000:
-                    color_class = 3
-                elif count > 2000000:
-                    color_class = 2
-                elif count > 1000000:
-                    color_class = 1
-                else:
-                    color_class = 0
-                color = colors[color_class]
-                p['style'] = g_style + color
+                check_tag = "tc_spbe17_2015_" + str(i)
+                if p.has_attr('fill'):
+                    pass
 
+                elif p.has_attr('qgisviewbox'):
+                    pass
+
+                elif p.has_attr('stroke'):
+                    pass
+
+                elif p['id'] in [check_tag]:
+                    try:
+                        count = senior_count[dongName_list[i-1]]
+                        i += 1
+                    except:
+                        count = -1
+                        i += 1
+
+                    if count > 1000000000:
+                        color_class = 5
+                    elif count > 50000000:
+                        color_class = 4
+                    elif count > 30000000:
+                        color_class = 3
+                    elif count > 20000000:
+                        color_class = 2
+                    elif count > 10000000:
+                        color_class = 1
+                    elif count==-1:
+                        color_class = 6
+                    else:
+                        color_class = 0
+                    color = colors[color_class]
+                    p['style'] = g_style + color
+
+                else:
+                    continue
     except Exception as e:
         logging.exception(e)
 
-    # print(soup.prettify())
-TestMap('2015')
+    with open('C:\\Users\\admin\\PycharmProjects\\DataAnalysis\\sample_'+year+'.svg', 'w') as file:
+        # 해당 BeautifulSoup 을 이용해서 저장할 경우,
+        # Body, html 태그가 svg 파일 안에 붙어서 나오는데
+        # 이 경우 svg 형태로 제대로 표현되지 않기 때문에, 해당 두 가지 태그들을 지워줘야 한다.
+        for match in soup.find_all(['body', 'html']):
+            match.unwrap()
+        file.write(str(soup))
 
-    # tl_scco_emd_2015_w_+number
+    print(year+"년도 서울지도 추출 성공...")
+
+TestMap('2015')
+TestMap('2016')
+TestMap('2017')
 

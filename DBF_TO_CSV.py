@@ -2,8 +2,8 @@ import csv
 from dbfpy import dbf
 import os
 import sys
-def ConvertDBF():
-    filename = "C:\\Users\\admin\Downloads\TL_SCCO_EMD_2015_W_SHP\\TL_SCCO_EMD_2015_W.dbf"
+def ConvertDBF(arguments):
+    filename = "C:\\Users\\admin\\Downloads\\"+arguments+"_SHP\\"+arguments+".dbf"
     if filename.endswith('.dbf'):
         print("Converting %s to csv" % filename)
         csv_fn = filename[:-4]+ ".csv"
@@ -20,3 +20,5 @@ def ConvertDBF():
             print("Done...")
     else:
         print("Filename does not end with .dbf")
+
+ConvertDBF("TC_SPBE17_2015")
