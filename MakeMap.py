@@ -13,7 +13,7 @@ def TestMap(year):
     dongName_list=[]
     soup = BeautifulSoup(svg, 'lxml')
     paths = soup.find_all('g')
-    colors = ["#E5E3FA", "#B0ABF9", "#847DFA", "#3D2FF7", "#0C0296", "#03002C", "#FF0000"]
+    colors = ["#E5E3FA", "#C7C2F9", "#A097F4", "#7B70E0", "#4739CC", "#180C8C", "#FF0000"]
     g_style = 'font-size:12px;fill-rule:nonzero;stroke:#FFFFFF;stroke-opacity:1;stroke-width:0.1;stroke-miterlimit:4;stroke-dasharray:none;stroke-linecap:butt;marker-start:none;stroke-linejoin:bevel;fill:'
     try:
         with open('C:\\Users\\admin\\PycharmProjects\\DataAnalysis\\data\\Food_Date_'+year+'.csv', 'r') as f:
@@ -58,18 +58,18 @@ def TestMap(year):
                         count = -1
                         i += 1
 
-                    if count > 1000000000:
-                        color_class = 5
-                    elif count > 50000000:
-                        color_class = 4
-                    elif count > 30000000:
-                        color_class = 3
-                    elif count > 20000000:
-                        color_class = 2
-                    elif count > 10000000:
-                        color_class = 1
-                    elif count==-1:
+                    if count == -1:
                         color_class = 6
+                    elif count > 1000000000:
+                        color_class = 5
+                    elif count > 500000000:
+                        color_class = 4
+                    elif count > 300000000:
+                        color_class = 3
+                    elif count > 200000000:
+                        color_class = 2
+                    elif count > 100000000:
+                        color_class = 1
                     else:
                         color_class = 0
                     color = colors[color_class]
@@ -89,6 +89,12 @@ def TestMap(year):
         file.write(str(soup))
 
     print(year+"년도 서울지도 추출 성공...")
+    print(senior_count)
+#
+# def Public_Holiday_Map():
+#
+# def Special_Holiday_Map():
+
 
 TestMap('2015')
 TestMap('2016')
